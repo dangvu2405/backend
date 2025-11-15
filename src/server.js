@@ -24,6 +24,8 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:5175',
+    'https://dtv2405.id.vn',
+    'https://www.dtv2405.id.vn',
     process.env.FRONTEND_URL
 ].filter(Boolean);
 
