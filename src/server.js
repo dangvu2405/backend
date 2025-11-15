@@ -93,6 +93,21 @@ const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.use(authMiddleware);
+
+// Request logging middleware - Log tất cả requests
+app.use((req, res, next) => {
+    console.log('📥 Incoming Request:', {
+        method: req.method,
+        url: req.url,
+        path: req.path,
+        query: req.query,
+        origin: req.headers.origin,
+        host: req.headers.host,
+        'user-agent': req.headers['user-agent']?.substring(0, 50)
+    });
+    next();
+});
+
 // ============================================
 // API Routes
 // ============================================
@@ -109,7 +124,25 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
+    console.error('❌ Error in request:', {
+        method: req.method,
+        url: req.url,
+        error: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
+    
+    // Handle CORS errors specifically
+    if (err.message === 'Not allowed by CORS') {
+        console.error('🚫 CORS Error - Origin not allowed:', req.headers.origin);
+        console.error('✅ Allowed origins:', allowedOrigins);
+        return res.status(403).json({
+            success: false,
+            message: 'CORS: Origin not allowed',
+            origin: req.headers.origin,
+            allowedOrigins: allowedOrigins
+        });
+    }
+    
     res.status(err.status || 500).json({
         success: false,
         message: err.message || 'Internal Server Error',
