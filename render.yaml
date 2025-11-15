@@ -6,6 +6,7 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -32,10 +33,9 @@ services:
       - key: VNPAY_HASH_SECRET
         sync: false
       - key: VNPAY_URL
-        sync: false
+        value: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
       - key: VNPAY_RETURN_URL
         value: https://dtv2405.id.vn/vnpay-return
-    healthCheckPath: /api/health
-    domains:
-      - api.dtv2405.id.vn
+      - key: SESSION_SECRET
+        sync: false
 
