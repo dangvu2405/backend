@@ -31,7 +31,10 @@
     "kill:port": "node scripts/killPort.js",
     "cloudinary:get-images": "node scripts/get-cloudinary-images.js",
     "cloudinary:upload-public": "node scripts/upload-public-images-to-cloudinary.js",
-    "cloudinary:upload-video": "node scripts/upload-video-to-cloudinary.js"
+    "cloudinary:upload-video": "node scripts/upload-video-to-cloudinary.js",
+    "cloudinary:update-products": "node scripts/update-products-to-cloudinary.js",
+    "cloudinary:update-all": "node scripts/update-all-products-cloudinary.js",
+    "cloudinary:seed-products": "node scripts/seed-products-with-cloudinary.js"
   },
   "keywords": [
     "api",
