@@ -12,16 +12,7 @@ router.get('/health', (req, res) => {
     });
 });
 
-router.get('/products', (req, res, next) => {
-    console.log('🛍️  GET /api/products - Request details:', {
-        query: req.query,
-        limit: req.query.limit,
-        page: req.query.page,
-        origin: req.headers.origin,
-        host: req.headers.host
-    });
-    SanPhamController.getAllProducts(req, res, next);
-});
+router.get('/products', SanPhamController.getAllProducts);
 router.get('/categories', LoaiSanPhamController.getAllCategories);
 router.get('/products/:id', SanPhamController.getProduct);
 module.exports = router;
