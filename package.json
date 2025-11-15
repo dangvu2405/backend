@@ -30,7 +30,8 @@
     "check:logs": "node scripts/checkLogs.js",
     "kill:port": "node scripts/killPort.js",
     "cloudinary:get-images": "node scripts/get-cloudinary-images.js",
-    "cloudinary:upload-public": "node scripts/upload-public-images-to-cloudinary.js"
+    "cloudinary:upload-public": "node scripts/upload-public-images-to-cloudinary.js",
+    "cloudinary:upload-video": "node scripts/upload-video-to-cloudinary.js"
   },
   "keywords": [
     "api",
