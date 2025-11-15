@@ -28,7 +28,8 @@
     "seed:product-images": "node src/scripts/seedProductImages.js",
     "test:vnpay": "node test-vnpay.js",
     "check:logs": "node scripts/checkLogs.js",
-    "kill:port": "node scripts/killPort.js"
+    "kill:port": "node scripts/killPort.js",
+    "cloudinary:get-images": "node scripts/get-cloudinary-images.js"
   },
   "keywords": [
     "api",
@@ -44,6 +45,7 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
+    "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

@@ -298,20 +298,67 @@ class TaiKhoanController {
                 return res.status(400).json({ message: 'Vui lòng chọn file ảnh để upload' });
             }
 
-            // Lấy đường dẫn file đã upload
-            const avatarUrl = `/uploads/${req.file.filename}`;
+            const cloudinaryService = require('../../services/cloudinary.service');
+            let avatarUrl;
+
+            // Upload lên Cloudinary nếu được cấu hình
+            if (cloudinaryService.isCloudinaryConfigured()) {
+                try {
+                    // Upload từ buffer (memory storage)
+                    const result = await cloudinaryService.uploadFromBuffer(req.file.buffer, {
+                        folder: 'avatars',
+                        transformation: [
+                            { width: 400, height: 400, crop: 'fill', quality: 'auto' }
+                        ]
+                    });
+                    
+                    // Lưu Public ID vào database (frontend sẽ tự build URL)
+                    avatarUrl = result.public_id;
+                    
+                    console.log('✅ Avatar uploaded to Cloudinary:', result.public_id);
+                } catch (cloudinaryError) {
+                    console.error('❌ Cloudinary upload failed, falling back to local:', cloudinaryError);
+                    // Fallback to local storage
+                    const path = require('path');
+                    const fs = require('fs');
+                    const uploadsDir = path.join(__dirname, '../../../uploads');
+                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                    const ext = path.extname(req.file.originalname);
+                    const filename = 'avatar-' + uniqueSuffix + ext;
+                    const filePath = path.join(uploadsDir, filename);
+                    
+                    // Save buffer to file
+                    fs.writeFileSync(filePath, req.file.buffer);
+                    avatarUrl = `/uploads/${filename}`;
+                }
+            } else {
+                // Local storage (disk storage)
+                avatarUrl = `/uploads/${req.file.filename}`;
+            }
 
             // Xóa avatar cũ nếu có
             const user = await TaiKhoan.findById(userId);
-            if (user && user.AvatarUrl && !user.AvatarUrl.startsWith('http')) {
-                const fs = require('fs');
-                const path = require('path');
-                const oldAvatarPath = path.join(__dirname, '../../..', user.AvatarUrl);
-                if (fs.existsSync(oldAvatarPath)) {
+            if (user && user.AvatarUrl) {
+                // Nếu là Cloudinary public_id, xóa từ Cloudinary
+                if (cloudinaryService.isCloudinaryConfigured() && !user.AvatarUrl.startsWith('http') && !user.AvatarUrl.startsWith('/')) {
                     try {
-                        fs.unlinkSync(oldAvatarPath);
+                        await cloudinaryService.deleteFromCloudinary(user.AvatarUrl);
+                        console.log('✅ Deleted old avatar from Cloudinary');
                     } catch (err) {
-                        console.error('Lỗi khi xóa avatar cũ:', err);
+                        console.error('⚠️  Error deleting old Cloudinary avatar:', err);
+                    }
+                } 
+                // Nếu là local file, xóa file local
+                else if (!user.AvatarUrl.startsWith('http') && user.AvatarUrl.startsWith('/uploads')) {
+                    const fs = require('fs');
+                    const path = require('path');
+                    const oldAvatarPath = path.join(__dirname, '../../..', user.AvatarUrl);
+                    if (fs.existsSync(oldAvatarPath)) {
+                        try {
+                            fs.unlinkSync(oldAvatarPath);
+                        } catch (err) {
+                            console.error('Lỗi khi xóa avatar cũ:', err);
+                        }
                     }
                 }
             }
