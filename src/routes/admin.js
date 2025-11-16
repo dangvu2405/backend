@@ -3,29 +3,23 @@ const router = express.Router();
 const AdminController = require('../app/controllers/AdminController');
 const adminMiddleware = require('../app/middlewares/admin.middleware');
 
-// ============================================
-// Áp dụng admin middleware cho TẤT CẢ routes
-// User PHẢI có role Admin mới truy cập được
-// ============================================
-router.use(adminMiddleware);
-
 // ==========================
 // PRODUCTS
 // ==========================
-router.post('/products', (req, res) => AdminController.createProduct(req, res));
-router.get('/products', (req, res) => AdminController.getAllProducts(req, res));
-router.get('/products/:id', (req, res) => AdminController.getProduct(req, res));
-router.put('/products/:id', (req, res) => AdminController.updateProduct(req, res));
-router.delete('/products/:id', (req, res) => AdminController.deleteProduct(req, res));
+router.post('/products', adminMiddleware, (req, res) => AdminController.createProduct(req, res));
+router.get('/products', adminMiddleware, (req, res) => AdminController.getAllProducts(req, res));
+router.get('/products/:id', adminMiddleware, (req, res) => AdminController.getProduct(req, res));
+router.put('/products/:id', adminMiddleware, (req, res) => AdminController.updateProduct(req, res));
+router.delete('/products/:id', adminMiddleware, (req, res) => AdminController.deleteProduct(req, res));
 
 // ==========================
 // CATEGORIES
 // ==========================
-router.post('/categories', (req, res) => AdminController.createCategory(req, res));
-router.get('/categories', (req, res) => AdminController.getAllCategories(req, res));
-router.get('/categories/:id', (req, res) => AdminController.getCategory(req, res));
-router.put('/categories/:id', (req, res) => AdminController.updateCategory(req, res));
-router.delete('/categories/:id', (req, res) => AdminController.deleteCategory(req, res));
+router.post('/categories', adminMiddleware, (req, res) => AdminController.createCategory(req, res));
+router.get('/categories', (req, res) => AdminController.getAllCategories(req, res)); // Không cần middleware
+router.get('/categories/:id', (req, res) => AdminController.getCategory(req, res)); // Không cần middleware
+router.put('/categories/:id', adminMiddleware, (req, res) => AdminController.updateCategory(req, res));
+router.delete('/categories/:id', adminMiddleware, (req, res) => AdminController.deleteCategory(req, res));
 
 // ==========================
 // ROLES
@@ -95,5 +89,14 @@ router.get('/stats/top-products', (req, res) => AdminController.getTopSellingPro
 router.get('/stats/low-stock', (req, res) => AdminController.getLowStockProducts(req, res));
 router.get('/stats/monthly-orders', (req, res) => AdminController.getMonthlyOrdersStats(req, res));
 router.get('/stats/top-customers', (req, res) => AdminController.getTopCustomersByOrders(req, res));
+
+// ==========================
+// REVIEWS (ĐÁNH GIÁ)
+// ==========================
+router.get('/reviews', (req, res) => AdminController.getAllReviews(req, res));
+router.get('/reviews/stats', (req, res) => AdminController.getReviewStats(req, res));
+router.get('/reviews/:id', (req, res) => AdminController.getReview(req, res));
+router.delete('/reviews/:id', (req, res) => AdminController.deleteReview(req, res));
+router.delete('/reviews', (req, res) => AdminController.deleteMultipleReviews(req, res));
 
 module.exports = router;
